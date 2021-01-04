@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/home/functions/category.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/Screens/home/functions/dashboard.dart';
-import 'package:flutter_auth/Screens/home/functions/settings.dart';
+import 'package:flutter_auth/Screens/home/functions/category.dart';
 import 'package:flutter_auth/Screens/home/functions/statistics.dart';
 import 'package:flutter_auth/Screens/home/functions/timetable.dart';
 import 'package:flutter_auth/services/auth.dart';
@@ -23,7 +24,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     Dashboard(),
     Timetable(),
     Statistics(),
-    Settings(),
+    Categories(),
   ];
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen = Dashboard(); 
@@ -40,13 +41,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     
     super.initState();
   }
-   final AuthService _auth = AuthService();
+  final AuthService _auth = AuthService();
   @override 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgoundColor,
+      backgroundColor:kPrimaryColor,
       appBar: AppBar(
-        backgroundColor:backgoundColor,
+        backgroundColor:kPrimaryColor,
         actions: <Widget>[
           FlatButton.icon(
             icon: Icon(Icons.person, color: kPrimaryLightColor,),
@@ -55,125 +56,111 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           )          
         ],
         ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      
-      //Init Floating Action Bubble 
-      floatingActionButton: FloatingActionBubble(
-        // Menu items
-        items: <Bubble>[
-          // Floating action menu item
-          Bubble(
-            title:"Timer",
-            iconColor :Colors.white,
-            bubbleColor : Colors.blue,
-            icon:Icons.settings,
-            titleStyle:TextStyle(fontSize: 16 , color: Colors.white),
-            onPress: () {
-              _animationController.reverse();
-            },
-          ),
-          // Floating action menu item
-          Bubble(
-            title:"Profile",
-            iconColor :Colors.white,
-            bubbleColor : Colors.blue,
-            icon:Icons.people,
-            titleStyle:TextStyle(fontSize: 16 , color: Colors.white),
-            onPress: () {
-              _animationController.reverse();
-            },
-          ),
 
-
-        ],
-
-        // animation controller
-        animation: _animation,
-
-        // On pressed change animation state
-        onPress: _animationController.isCompleted
-            ? _animationController.reverse
-            : _animationController.forward,
-        
-        // Floating Action button Icon color
-        iconColor: Colors.blue,
 
         // Flaoting Action button Icon 
-        icon: AnimatedIcons.add_event,
+      
+      
+      body: PageStorage(
+        child: currentScreen,
+        bucket: bucket,
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ), 
       bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 10,
         child: Container(
-          margin: EdgeInsets.only(left: 12.0, right: 12.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          height: 60,
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+            MaterialButton(minWidth:40, onPressed: (){ setState((){currentScreen = Dashboard(); currentTab = 0;});
+            },
+            child: Column(mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              IconButton(
-                //update the bottom app bar view each time an item is clicked
-                onPressed: () {
-                  updateTabSelection(0, "Home");
-                },
-                iconSize: 27.0,
-                icon: Icon(
-                  Icons.home_rounded,
-                  //darken the icon if it is selected or else give it a different color
-                  color: selectedIndex == 0
-                      ? Colors.blue.shade900
-                      : Colors.grey.shade400,
-                ),
+              Icon(Icons.dashboard_rounded, color: currentTab==0 ? retroCo: kPrimaryLightColor,
               ),
-              IconButton(
-                onPressed: () {
-                  updateTabSelection(1, "TimeTable");
-                },
-                iconSize: 27.0,
-                icon: Icon(
-                  Icons.calendar_today_rounded,
-                  color: selectedIndex == 1
-                      ? Colors.blue.shade900
-                      : Colors.grey.shade400,
-                ),
+              Text('Dasboard', style: TextStyle(color:currentTab==0 ? retroCo: kPrimaryLightColor, fontFamily: 'Pixel',
               ),
-              //to leave space in between the bottom app bar items and below the FAB
-              SizedBox(
-                width: 50.0,
-              ),
-              IconButton(
-                onPressed: () {
-                  updateTabSelection(2, "To Do's");
-                },
-                iconSize: 27.0,
-                icon: Icon(
-                  Icons.check_circle_outline,
-                  color: selectedIndex == 2
-                      ? Colors.blue.shade900
-                      : Colors.grey.shade400,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  updateTabSelection(3, "Settings");
-                },
-                iconSize: 27.0,
-                icon: Icon(
-                  Icons.settings,
-                  color: selectedIndex == 3
-                      ? Colors.blue.shade900
-                      : Colors.grey.shade400,
-                ),
               ),
             ],
+            ),
+            ),
+            MaterialButton(minWidth: 40, onPressed: () {setState(() {currentScreen = Timetable(); currentTab = 1;});},
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Icons.calendar_today_rounded, color: currentTab == 1 ? retroCo: kPrimaryLightColor,
+                        ),
+                  Text(
+                    'TimeTable',
+                    style: TextStyle(color: currentTab == 1 ? retroCo: kPrimaryLightColor, fontFamily: 'Pixel',
+                      ),
+                    ),
+                ],
+                ),
+              )
+            ],
           ),
-        ),
-        //to add a space between the FAB and BottomAppBar
-        shape: CircularNotchedRectangle(),
-        //color of the BottomAppBar
-        color: Colors.white,
+          //Right Tab bar icons
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+            MaterialButton(minWidth: 40, onPressed: () {
+              setState(() {currentScreen = Categories(); // if user taps on this dashboard tab will be active
+                currentTab = 2;
+                      });
+                    },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.dvr_rounded,
+                  color: currentTab == 2 ? retroCo: kPrimaryLightColor,
+                        ),
+                  Text(
+                          'Categories',
+                          style: TextStyle(
+                            color: currentTab == 2 ? retroCo: kPrimaryLightColor, fontFamily: 'Pixel',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              MaterialButton(
+                    minWidth: 40,
+                    onPressed: () {
+                      setState(() {
+                        currentScreen = Statistics(); // if user taps on this dashboard tab will be active
+                        currentTab = 3;
+                      });
+                    },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Icons.insert_chart,
+                    color: currentTab == 3 ? retroCo: kPrimaryLightColor,
+                        ),
+                  Text(
+                          'Statistics',
+                          style: TextStyle(
+                            color: currentTab == 3 ? retroCo: kPrimaryLightColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              )
+
+            ],
+            ),
+          
+          ),
       ),
+
+
       
     );
+    
   }
 }
